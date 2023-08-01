@@ -1,6 +1,8 @@
 
 const mongoose = require('mongoose');
-let collection = 'agros';
+const dotnev = require('dotenv').config();
+
+let collection = process.env.collect;
 
 const agroEmployeesSchema =  mongoose.Schema({
     name: String,
