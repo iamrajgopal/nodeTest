@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 let collection = 'Agro';
 
-const agroEmployeesSchema = new mongoose.Schema({
+const agroEmployeesSchema =  mongoose.Schema({
     name: String,
     gender: String,
     age: Number,
@@ -11,6 +11,6 @@ const agroEmployeesSchema = new mongoose.Schema({
     password: String
 });
 
-const employees = mongoose.model(collection, agroEmployeesSchema);
+const employees = new mongoose.model(collection, agroEmployeesSchema);
 
 module.exports = employees;

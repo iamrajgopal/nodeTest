@@ -14,4 +14,4 @@ let postingEmployeeDetails = async (req,res)=>{
 
 }
 
-module.exports = {postingEmployeeDetails} ;
+module.exports = postingEmployeeDetails ;
