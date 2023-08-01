@@ -1,22 +1,18 @@
 const express = require('express');
 const cors = require('cors');
-const route = require('./routes/agroEmployeeRoute');
-const connection = require('./dataBase/db')
 
 const Port = process.env.Port || 5000
-
+const connection = require('./dataBase/db')
 
 const app = express();
+app.use(express.json());
 app.use(cors());
 
-app.use('/employee',route)
-// app.post('/postingEmployeeDetails', async (req, res) => {
-   
-// })
+const route = require('./routes/agroEmployeeRoute');
 
-app.get('/', (req, res) => {
-    res.send("hello world")
-})
+//route for posting employees details
+app.use('/employee',route);
+app.use('/validEmployee',route)
 
 app.listen(Port, () => {
     console.log(`Listening To Port :${Port}`)

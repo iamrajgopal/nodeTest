@@ -8,7 +8,7 @@ const agroEmployeesSchema =  mongoose.Schema({
     name: String,
     gender: String,
     age: Number,
-    phone: Number,
+    mobile: Number,
     email: String,
     password: String
 });
