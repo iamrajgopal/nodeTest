@@ -1,6 +1,6 @@
 
 const mongoose = require('mongoose');
-let collection = 'Agro';
+let collection = 'agros';
 
 const agroEmployeesSchema =  mongoose.Schema({
     name: String,
