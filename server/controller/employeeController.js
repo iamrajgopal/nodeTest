@@ -1,4 +1,8 @@
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+const jwt = require('jsonwebtoken');
 const employees = require("../model/agroEmployeeModel");
+
 
 let postingEmployeeDetails = async (req, res) => {
     let theuserCredentials = req.body;
@@ -12,7 +16,9 @@ let postingEmployeeDetails = async (req, res) => {
             data: existingEmployee,
           })
         } else {
-            const savedEmployee = await employees.insertMany(theuserCredentials);
+            //used bcrypt for password proection hashing
+            let hashedPassword = await bcrypt.hash(theuserCredentials.password,saltRounds)
+            const savedEmployee = await employees.insertMany({email: theuserCredentials.email,password:hashedPassword,name:theuserCredentials.name,mobile:theuserCredentials.mobile});
             res.status(200).send({
                     status: "success",
                     message: "user registered sucessfully",
@@ -27,20 +33,32 @@ let postingEmployeeDetails = async (req, res) => {
 
 //validating And givingauthentication to user
 
+//jwt secretkeys
+
+const jwt_secret = 'JSONtoken'
+
 let ValidationEmployee = async (req,res)=>{
    let loginDetails = req.body;
+   let Email = loginDetails.email;
+   let Pass = loginDetails.password
    try {
-    let userExist = await employees.findOne({email:loginDetails.email});
-    console.log(userExist)
+    let userExist = await employees.findOne({email:Email});
+
+    //sending token to front-end if password is correct
+    const token = await jwt.sign({email:userExist?userExist.email:''},jwt_secret,
+    // {expiresIn: 60}
+    );
 
     if(userExist){
-        console.log(userExist.password);
-        console.log(loginDetails.password)
-        if(userExist.password===loginDetails.password){
+        //bcrypt is compared with the userGiven to  the database password
+        const isPasswordMatched = await bcrypt.compare(Pass, userExist.password);
+
+        if(isPasswordMatched===true){
             res.status(200).send({
                 status: "sucess",
                 message: "Logged In Sucessfully",
                 data: userExist,
+                token:token
               }) 
         }else{
             res.status(200).json({status:'wrong',message:'Entered a wrong Password'})
@@ -55,8 +73,19 @@ let ValidationEmployee = async (req,res)=>{
    }
 }
 
+let validatingToken = async (req,res)=>{
+ const tokenFromClient = req.body.token;
+ //getting already existing token from the user and decrypting it and searching if user ,then if user exists sending success user can login auto: 
+ const decodedToken = jwt.verify(tokenFromClient,jwt_secret);
 
-module.exports = {postingEmployeeDetails,ValidationEmployee}
+    let userExist = await employees.findOne({email:decodedToken.email}) ;
+     if (userExist){
+        res.json({status:'success',data:userExist})
+     }else{
+        res.json({status:'unSuccessful'})
+     }
+
+}
 
 
-// module.exports = ValidationEmployee
+module.exports = {postingEmployeeDetails,ValidationEmployee,validatingToken}
